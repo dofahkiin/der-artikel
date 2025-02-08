@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>German Articles Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      text-align: center;
+    }
+    .word {
+      font-size: 2em;
+      margin: 20px 0;
+      cursor: pointer;
+    }
+    .button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    .button.correct {
+      background-color: green;
+      color: white;
+    }
+    .button.wrong {
+      background-color: red;
+      color: white;
+    }
+    .status {
+      margin: 20px 0;
+    }
+    #failedListsContainer {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Guess the German Article</h1>
+
+  <div class="status">
+    <span id="progress">0</span> words answered,
+    <span id="remaining">0</span> remaining
+  </div>
+
+  <!-- The word to guess -->
+  <div class="word" id="word">Loading...</div>
+
+  <!-- Article Buttons -->
+  <div id="buttons">
+    <button class="button" onclick="checkAnswer('der')">Der</button>
+    <button class="button" onclick="checkAnswer('die')">Die</button>
+    <button class="button" onclick="checkAnswer('das')">Das</button>
+  </div>
+
+  <!-- Next / Stop Buttons -->
+  <button class="button" id="nextButton" onclick="nextWord()">Next</button>
+  <button class="button" id="stopButton" onclick="stopQuiz()">Stop</button>
+
+  <!-- Results -->
+  <div id="results" style="display:none; margin-top:20px;"></div>
+  
+  <!-- Buttons for after quiz ends -->
+  <button class="button" id="failedListButton" style="display:none;" onclick="startFailedListQuiz()">
+    Failed list
+  </button>
+  <!-- Save the failed list to a new JSON file -->
+  <button class="button" id="saveFailedListButton" style="display:none;" onclick="saveFailedList()">
+    Save failed list
+  </button>
+
+  <!-- Container to show the list of existing saved failed-lists -->
+  <div id="failedListsContainer" style="display:none;">
+    <h2>Saved Failed Lists</h2>
+    <select id="failedListsSelect">
+      <option value="">-- Choose a file --</option>
+    </select>
+    <button class="button" onclick="loadSelectedFailedList()">Load Selected List</button>
+    <div id="loadError" style="color:red; margin-top:10px;"></div>
+  </div>
+
+  <script>
+    let allWords = [];
+    let words = [];
+    let currentWordIndex = 0;
+    let correctAnswers = 0;
+    let wrongAnswers = 0;
+    let wrongWords = [];
+
+    // Toggling German/English
+    let showingEnglish = false;
+
+    async function loadWords() {
+      const response = await fetch('words.json');
+      allWords = await response.json();
+      words = [...allWords];
+      updateStatus();
+      showWord();
+    }
+
+    function toggleTranslation() {
+      if (words.length === 0) return;
+      showingEnglish = !showingEnglish;
+      const current = words[currentWordIndex];
+      document.getElementById('word').innerText = showingEnglish
+        ? current.translation
+        : current.word;
+    }
+
+    function updateStatus() {
+      document.getElementById('progress').innerText = correctAnswers + wrongAnswers;
+      document.getElementById('remaining').innerText = words.length - (correctAnswers + wrongAnswers);
+    }
+
+    function showWord() {
+      if (currentWordIndex < words.length) {
+        showingEnglish = false;
+        document.getElementById('word').innerText = words[currentWordIndex].word;
+
+        // Reset buttons
+        document.querySelectorAll('.button').forEach(btn => {
+          btn.classList.remove('correct', 'wrong');
+          btn.disabled = false;
+        });
+        document.getElementById('nextButton').disabled = true;
+      } else {
+        stopQuiz();
+      }
+    }
+
+    function checkAnswer(article) {
+      const buttons = document.querySelectorAll('.button');
+      const correctArticle = words[currentWordIndex].article;
+
+      buttons.forEach(btn => {
+        if (btn.innerText.toLowerCase() === article) {
+          btn.disabled = false;
+        } else {
+          btn.disabled = true;
+        }
+      });
+
+      if (article === correctArticle) {
+        correctAnswers++;
+        document.querySelector(`button[onclick="checkAnswer('${article}')"]`).classList.add('correct');
+      } else {
+        wrongAnswers++;
+        wrongWords.push({
+          word: words[currentWordIndex].word,
+          article: words[currentWordIndex].article,
+          translation: words[currentWordIndex].translation,
+          yourAnswer: article
+        });
+        document.querySelector(`button[onclick="checkAnswer('${article}')"]`).classList.add('wrong');
+        document.querySelector(`button[onclick="checkAnswer('${correctArticle}')"]`).classList.add('correct');
+      }
+      document.getElementById('nextButton').disabled = false;
+      updateStatus();
+    }
+
+    function nextWord() {
+      currentWordIndex++;
+      showWord();
+    }
+
+    function stopQuiz() {
+      document.getElementById('results').style.display = 'block';
+
+      let wrongWordsList = '';
+      if (wrongWords.length > 0) {
+        wrongWordsList = '<h3>Words You Got Wrong:</h3><ul>';
+        wrongWords.forEach(item => {
+          wrongWordsList += `
+            <li>
+              ${item.word} (correct: ${item.article}, your answer: ${item.yourAnswer})
+            </li>`;
+        });
+        wrongWordsList += '</ul>';
+      }
+
+      document.getElementById('results').innerHTML = `
+        <h2>Results</h2>
+        <p>Correct Answers: ${correctAnswers}</p>
+        <p>Wrong Answers: ${wrongAnswers}</p>
+        <p>Total Words Answered: ${correctAnswers + wrongAnswers}</p>
+        ${wrongWordsList}
+      `;
+
+      // Hide quiz controls
+      document.getElementById('buttons').style.display = 'none';
+      document.getElementById('word').style.display = 'none';
+      document.getElementById('nextButton').style.display = 'none';
+      document.getElementById('stopButton').style.display = 'none';
+
+      // Show "Failed list" button & "Save failed list" if any failures
+      if (wrongWords.length > 0) {
+        document.getElementById('failedListButton').style.display = 'inline-block';
+        document.getElementById('saveFailedListButton').style.display = 'inline-block';
+      }
+
+      // Show the container that lists previously saved files
+      document.getElementById('failedListsContainer').style.display = 'block';
+      fetchFailedLists(); // load the droplist of saved files
+    }
+
+    // Start a new quiz with only the previously wrong words
+    function startFailedListQuiz() {
+      words = [...wrongWords];
+      currentWordIndex = 0;
+      correctAnswers = 0;
+      wrongAnswers = 0;
+      wrongWords = [];
+
+      // Hide results
+      document.getElementById('results').style.display = 'none';
+      // Hide the "failed list" and "save" buttons
+      document.getElementById('failedListButton').style.display = 'none';
+      document.getElementById('saveFailedListButton').style.display = 'none';
+
+      // Show quiz UI again
+      document.getElementById('buttons').style.display = 'block';
+      document.getElementById('word').style.display = 'block';
+      document.getElementById('nextButton').style.display = 'inline-block';
+      document.getElementById('stopButton').style.display = 'inline-block';
+
+      updateStatus();
+      showWord();
+    }
+
+    // --- NEW: Save the current 'wrongWords' to a new JSON file on the server ---
+    async function saveFailedList() {
+      try {
+        if (wrongWords.length === 0) {
+          alert('No failed words to save!');
+          return;
+        }
+
+        const response = await fetch('/quiz-api/failed-lists', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(wrongWords)
+        });
+
+        if (!response.ok) {
+          // e.g. 500 or 400
+          const errorData = await response.json();
+          alert('Error: ' + (errorData.error || 'Could not save failed list.'));
+          return;
+        }
+
+        const data = await response.json();
+        alert('Saved successfully: ' + data.fileName);
+
+        // Re-fetch the list of existing saved files to update the droplist
+        fetchFailedLists();
+
+      } catch (err) {
+        console.error(err);
+        alert('Error saving failed list: ' + err.message);
+      }
+    }
+
+    // --- NEW: Fetch the list of existing saved failed-lists from the server ---
+    async function fetchFailedLists() {
+      const select = document.getElementById('failedListsSelect');
+      select.innerHTML = '<option value="">-- Choose a file --</option>'; // reset
+
+      try {
+        const res = await fetch('/quiz-api/failed-lists');
+        if (!res.ok) {
+          document.getElementById('loadError').innerText = 'Could not load saved lists.';
+          return;
+        }
+        const data = await res.json();
+        const files = data.files || [];
+
+        files.forEach(fileName => {
+          const option = document.createElement('option');
+          option.value = fileName;
+          option.innerText = fileName;
+          select.appendChild(option);
+        });
+      } catch (err) {
+        console.error('Error fetching lists:', err);
+        document.getElementById('loadError').innerText = 'Error fetching lists: ' + err.message;
+      }
+    }
+
+    // --- NEW: Load the words from the selected saved file and start a quiz with them ---
+    async function loadSelectedFailedList() {
+      const select = document.getElementById('failedListsSelect');
+      const fileName = select.value;
+      if (!fileName) {
+        document.getElementById('loadError').innerText = 'Please select a file first.';
+        return;
+      }
+      document.getElementById('loadError').innerText = '';
+
+      try {
+        const res = await fetch('/quiz-api/failed-lists/' + fileName);
+        if (!res.ok) {
+          document.getElementById('loadError').innerText = 'Error loading file.';
+          return;
+        }
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          document.getElementById('loadError').innerText = 'No words found in that file.';
+          return;
+        }
+
+        // Now start a new quiz with these words
+        words = data;
+        currentWordIndex = 0;
+        correctAnswers = 0;
+        wrongAnswers = 0;
+        wrongWords = [];
+
+        // Hide results
+        document.getElementById('results').style.display = 'none';
+        document.getElementById('failedListButton').style.display = 'none';
+        document.getElementById('saveFailedListButton').style.display = 'none';
+
+        // Show quiz UI again
+        document.getElementById('buttons').style.display = 'block';
+        document.getElementById('word').style.display = 'block';
+        document.getElementById('nextButton').style.display = 'inline-block';
+        document.getElementById('stopButton').style.display = 'inline-block';
+
+        updateStatus();
+        showWord();
+      } catch (err) {
+        console.error('Error loading file:', err);
+        document.getElementById('loadError').innerText = 'Error: ' + err.message;
+      }
+    }
+
+    // On word click, toggle translation
+    document.getElementById('word').addEventListener('click', toggleTranslation);
+
+    // Load initial words on page load
+    loadWords();
+  </script>
+</body>
+</html>
