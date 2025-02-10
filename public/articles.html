@@ -92,6 +92,9 @@
     // Toggling German/English
     let showingEnglish = false;
 
+    // Prevent repeated clicks on the same question:
+    let questionAnswered = false;
+
     async function loadWords() {
       const response = await fetch('words.json');
       allWords = await response.json();
@@ -100,8 +103,9 @@
       showWord();
     }
 
+    // Toggle between the German word and its English translation
     function toggleTranslation() {
-      if (words.length === 0) return;
+      if (!words.length) return;
       showingEnglish = !showingEnglish;
       const current = words[currentWordIndex];
       document.getElementById('word').innerText = showingEnglish
@@ -116,6 +120,9 @@
 
     function showWord() {
       if (currentWordIndex < words.length) {
+        // Reset the "answered" flag so each word can only be answered once
+        questionAnswered = false;
+
         showingEnglish = false;
         document.getElementById('word').innerText = words[currentWordIndex].word;
 
@@ -124,6 +131,7 @@
           btn.classList.remove('correct', 'wrong');
           btn.disabled = false;
         });
+        // Next button is disabled until a user picks an answer
         document.getElementById('nextButton').disabled = true;
       } else {
         stopQuiz();
@@ -131,17 +139,13 @@
     }
 
     function checkAnswer(article) {
-      const buttons = document.querySelectorAll('.button');
+      // If user already answered this word, do nothing
+      if (questionAnswered) return;
+      questionAnswered = true;
+
       const correctArticle = words[currentWordIndex].article;
 
-      buttons.forEach(btn => {
-        if (btn.innerText.toLowerCase() === article) {
-          btn.disabled = false;
-        } else {
-          btn.disabled = true;
-        }
-      });
-
+      // Mark correct or wrong
       if (article === correctArticle) {
         correctAnswers++;
         document.querySelector(`button[onclick="checkAnswer('${article}')"]`).classList.add('correct');
@@ -156,7 +160,14 @@
         document.querySelector(`button[onclick="checkAnswer('${article}')"]`).classList.add('wrong');
         document.querySelector(`button[onclick="checkAnswer('${correctArticle}')"]`).classList.add('correct');
       }
+
+      // Disable the 3 article buttons so they can’t be re-clicked
+      const buttons = document.querySelectorAll('#buttons .button');
+      buttons.forEach(btn => btn.disabled = true);
+
+      // Now user can proceed with Next
       document.getElementById('nextButton').disabled = false;
+
       updateStatus();
     }
 
@@ -194,15 +205,15 @@
       document.getElementById('nextButton').style.display = 'none';
       document.getElementById('stopButton').style.display = 'none';
 
-      // Show "Failed list" button & "Save failed list" if any failures
+      // Show "Failed list" button & "Save" if any failures
       if (wrongWords.length > 0) {
         document.getElementById('failedListButton').style.display = 'inline-block';
         document.getElementById('saveFailedListButton').style.display = 'inline-block';
       }
 
-      // Show the container that lists previously saved files
+      // Show container for previously saved lists
       document.getElementById('failedListsContainer').style.display = 'block';
-      fetchFailedLists(); // load the droplist of saved files
+      fetchFailedLists();
     }
 
     // Start a new quiz with only the previously wrong words
@@ -229,7 +240,7 @@
       showWord();
     }
 
-    // --- NEW: Save the current 'wrongWords' to a new JSON file on the server ---
+    // Save the current 'wrongWords' to a new JSON file on the server
     async function saveFailedList() {
       try {
         if (wrongWords.length === 0) {
@@ -244,7 +255,6 @@
         });
 
         if (!response.ok) {
-          // e.g. 500 or 400
           const errorData = await response.json();
           alert('Error: ' + (errorData.error || 'Could not save failed list.'));
           return;
@@ -252,8 +262,6 @@
 
         const data = await response.json();
         alert('Saved successfully: ' + data.fileName);
-
-        // Re-fetch the list of existing saved files to update the droplist
         fetchFailedLists();
 
       } catch (err) {
@@ -262,10 +270,10 @@
       }
     }
 
-    // --- NEW: Fetch the list of existing saved failed-lists from the server ---
+    // Fetch the list of existing saved failed-lists
     async function fetchFailedLists() {
       const select = document.getElementById('failedListsSelect');
-      select.innerHTML = '<option value="">-- Choose a file --</option>'; // reset
+      select.innerHTML = '<option value="">-- Choose a file --</option>';
 
       try {
         const res = await fetch('/quiz-api/failed-lists');
@@ -288,7 +296,7 @@
       }
     }
 
-    // --- NEW: Load the words from the selected saved file and start a quiz with them ---
+    // Load the words from the selected saved file and start a quiz with them
     async function loadSelectedFailedList() {
       const select = document.getElementById('failedListsSelect');
       const fileName = select.value;
@@ -310,7 +318,6 @@
           return;
         }
 
-        // Now start a new quiz with these words
         words = data;
         currentWordIndex = 0;
         correctAnswers = 0;
