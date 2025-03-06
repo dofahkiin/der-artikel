@@ -1,5 +1,6 @@
 /* Modern design for German Articles Quiz */
 :root {
+    /* Light theme variables */
     --primary: #4E6CFF;
     --primary-dark: #3A56E8;
     --secondary: #FF6B6B;
@@ -9,14 +10,28 @@
     --correct: #38A169;
     --wrong: #E53E3E;
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --bg-color: var(--light);
+    --container-bg: white;
+    --text-color: var(--dark);
+    --word-bg: var(--light);
     --radius: 12px;
     --transition: all 0.3s ease;
-  }
-  
-  body {
+}
+
+/* Dark theme class */
+.dark-theme {
+    --bg-color: #1A202C;
+    --container-bg: #2D3748;
+    --text-color: #F7FAFC;
+    --light: #4A5568;
+    --word-bg: #4A5568;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+body {
     font-family: 'Nunito', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: var(--light);
-    color: var(--dark);
+    background-color: var(--bg-color);
+    color: var(--text-color);
     margin: 0;
     padding: 20px;
     line-height: 1.6;
@@ -25,29 +40,89 @@
     align-items: center;
     justify-content: flex-start;
     min-height: 100vh;
-  }
+    transition: var(--transition);
+}
   
-  /* Main container */
-  .quiz-container {
-    background-color: white;
+/* Main container */
+.quiz-container {
+    background-color: var(--container-bg);
     box-shadow: var(--shadow);
     border-radius: var(--radius);
     padding: 2rem;
     max-width: 500px;
     width: 100%;
     margin: 0 auto;
-  }
+    transition: var(--transition);
+}
   
-  h1 {
+h1 {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--primary);
     margin-bottom: 1.5rem;
     text-align: center;
-  }
+}
+
+/* Theme toggle switch */
+.theme-switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--gray);
+    transition: var(--transition);
+    border-radius: 30px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: var(--transition);
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(30px);
+}
+
+.theme-icon {
+    margin: 0 8px;
+    font-size: 20px;
+}
   
-  .status {
-    background-color: var(--light);
+.status {
+    background-color: var(--word-bg);
     border-radius: var(--radius);
     padding: 0.8rem 1.2rem;
     margin: 1.5rem 0;
@@ -56,41 +131,42 @@
     font-weight: 600;
     color: var(--gray);
     font-size: 0.9rem;
-  }
+    transition: var(--transition);
+}
   
-  .status-item {
+.status-item {
     display: flex;
     align-items: center;
-  }
+}
   
-  .status-item span {
+.status-item span {
     margin-left: 0.5rem;
     font-weight: 700;
-    color: var(--dark);
-  }
+    color: var(--text-color);
+}
   
-  /* Word display */
-  .word {
+/* Word display */
+.word {
     font-size: 2rem;
     font-weight: 700;
     margin: 2rem 0;
     padding: 1.5rem;
-    background-color: var(--light);
+    background-color: var(--word-bg);
     border-radius: var(--radius);
     cursor: pointer;
     transition: var(--transition);
-    color: var(--dark);
+    color: var(--text-color);
     text-align: center;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
     position: relative;
-  }
+}
   
-  .word:hover {
+.word:hover {
     transform: translateY(-2px);
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 4px 8px rgba(0,0,0,0.05);
-  }
+}
   
-  .word::after {
+.word::after {
     content: "👆 Tap for translation";
     position: absolute;
     bottom: -1.5rem;
@@ -100,19 +176,19 @@
     font-weight: normal;
     color: var(--gray);
     opacity: 0.7;
-  }
+}
   
-  /* Article buttons */
-  #buttons {
+/* Article buttons */
+#buttons {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     margin: 2rem 0;
-  }
+}
   
-  .button {
-    background-color: white;
-    color: var(--dark);
+.button {
+    background-color: var(--container-bg);
+    color: var(--text-color);
     border: 2px solid var(--primary);
     border-radius: var(--radius);
     padding: 0.8rem 1rem;
@@ -126,125 +202,127 @@
     height: auto;
     width: auto;
     min-height: 60px;
-  }
+}
   
-  .button:hover {
+.button:hover {
     background-color: var(--primary);
     color: white;
     transform: translateY(-2px);
-  }
+}
   
-  .button:active {
+.button:active {
     transform: translateY(0);
-  }
+}
   
-  .button:disabled {
+.button:disabled {
     opacity: 0.7;
     cursor: not-allowed;
     transform: none;
-  }
+}
   
-  .button.correct {
+.button.correct {
     background-color: var(--correct);
     border-color: var(--correct);
     color: white;
-  }
+}
   
-  .button.wrong {
+.button.wrong {
     background-color: var(--wrong);
     border-color: var(--wrong);
     color: white;
-  }
+}
   
-  /* Navigation buttons */
-  .nav-buttons {
+/* Navigation buttons */
+.nav-buttons {
     display: flex;
     justify-content: space-between;
     margin-top: 1.5rem;
-  }
+}
   
-  #nextButton, #stopButton {
+#nextButton, #stopButton {
     padding: 0.8rem 1.5rem;
     border-radius: var(--radius);
     font-weight: 600;
     transition: var(--transition);
     width: 48%;
-  }
+}
   
-  #nextButton {
+#nextButton {
     background-color: var(--primary);
     color: white;
     border: none;
-  }
+}
   
-  #nextButton:hover {
+#nextButton:hover {
     background-color: var(--primary-dark);
-  }
+}
   
-  #nextButton:disabled {
+#nextButton:disabled {
     background-color: var(--gray);
     cursor: not-allowed;
-  }
+}
   
-  #stopButton {
+#stopButton {
     background-color: transparent;
     color: var(--gray);
     border: 2px solid var(--gray);
-  }
+}
   
-  #stopButton:hover {
+#stopButton:hover {
     background-color: var(--gray);
     color: white;
-  }
+}
   
-  /* Results section */
-  #results {
-    background-color: white;
+/* Results section */
+#results {
+    background-color: var(--container-bg);
     border-radius: var(--radius);
     padding: 1.5rem;
     margin-top: 2rem;
     box-shadow: var(--shadow);
     width: 100%;
-  }
+    transition: var(--transition);
+}
   
-  #results h2 {
+#results h2 {
     color: var(--primary);
     font-size: 1.5rem;
     margin-bottom: 1rem;
     border-bottom: 2px solid var(--light);
     padding-bottom: 0.5rem;
-  }
+}
   
-  #results h3 {
-    color: var(--dark);
+#results h3 {
+    color: var(--text-color);
     font-size: 1.2rem;
     margin: 1.5rem 0 0.8rem;
-  }
+}
   
-  #results p {
+#results p {
     margin: 0.5rem 0;
     font-size: 1rem;
-  }
+}
   
-  #results ul {
+#results ul {
     list-style-type: none;
     padding: 0;
     margin: 1rem 0;
-  }
+}
   
-  #results li {
+#results li {
     padding: 0.8rem;
     margin-bottom: 0.8rem;
-    background-color: var(--light);
+    background-color: var(--word-bg);
     border-radius: var(--radius);
     font-size: 0.95rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
+    transition: var(--transition);
+}
   
-  /* Failed lists section */
-  #failedListButton, #saveFailedListButton {
+/* Failed lists section */
+#failedListButton, #saveFailedListButton {
     margin: 1rem 0.5rem;
     padding: 0.8rem 1.5rem;
     background-color: var(--primary);
@@ -252,42 +330,44 @@
     border: none;
     border-radius: var(--radius);
     font-weight: 600;
-  }
+}
   
-  #failedListsContainer {
+#failedListsContainer {
     margin-top: 2rem;
     padding: 1.5rem;
-    background-color: white;
+    background-color: var(--container-bg);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     width: 100%;
-  }
+    transition: var(--transition);
+}
   
-  #failedListsContainer h2 {
+#failedListsContainer h2 {
     color: var(--primary);
     font-size: 1.3rem;
     margin-bottom: 1rem;
-  }
+}
   
-  #failedListsSelect {
+#failedListsSelect {
     padding: 0.8rem;
     border-radius: var(--radius);
     border: 2px solid var(--light);
     font-size: 1rem;
     margin-right: 0.5rem;
-    background-color: white;
-    color: var(--dark);
+    background-color: var(--container-bg);
+    color: var(--text-color);
     width: 100%;
     margin-bottom: 1rem;
-  }
+    transition: var(--transition);
+}
   
-  #loadError {
+#loadError {
     color: var(--wrong);
     margin-top: 0.8rem;
-  }
+}
   
-  /* Responsive adjustments */
-  @media (max-width: 600px) {
+/* Responsive adjustments */
+@media (max-width: 600px) {
     .quiz-container {
       padding: 1.5rem;
       margin: 0;
@@ -308,4 +388,4 @@
       font-size: 1rem;
       min-height: 50px;
     }
-  }
+}

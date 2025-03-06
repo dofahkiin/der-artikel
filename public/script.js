@@ -11,6 +11,9 @@ let showingEnglish = false;
 // Prevent repeated clicks on the same question:
 let questionAnswered = false;
 
+// Theme preference
+let darkThemeEnabled = false;
+
 async function loadWords() {
   try {
     const response = await fetch('words.json');
@@ -64,6 +67,31 @@ function toggleTranslation() {
       : current.word;
     wordElement.style.opacity = '1';
   }, 150);
+}
+
+// Toggle dark/light theme
+function toggleTheme() {
+  darkThemeEnabled = !darkThemeEnabled;
+  
+  if (darkThemeEnabled) {
+    document.body.classList.add('dark-theme');
+  } else {
+    document.body.classList.remove('dark-theme');
+  }
+  
+  // Save preference to localStorage
+  localStorage.setItem('darkTheme', darkThemeEnabled ? 'enabled' : 'disabled');
+}
+
+// Check for saved theme preference
+function loadThemePreference() {
+  const savedTheme = localStorage.getItem('darkTheme');
+  
+  if (savedTheme === 'enabled') {
+    darkThemeEnabled = true;
+    document.body.classList.add('dark-theme');
+    document.getElementById('themeToggle').checked = true;
+  }
 }
 
 function updateStatus() {
@@ -367,6 +395,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Add transition for word element
   const wordElement = document.getElementById('word');
   wordElement.style.transition = 'opacity 0.15s ease, transform 0.3s ease';
+  
+  // Set up theme toggle
+  const themeToggle = document.getElementById('themeToggle');
+  themeToggle.addEventListener('change', toggleTheme);
+  
+  // Load saved theme preference
+  loadThemePreference();
   
   // Load words
   loadWords();
