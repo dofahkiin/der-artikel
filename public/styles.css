@@ -55,20 +55,25 @@ body {
     transition: var(--transition);
 }
   
+/* Header container for title and theme toggle */
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
 h1 {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--primary);
-    margin-bottom: 1.5rem;
-    text-align: center;
+    margin: 0;
 }
 
 /* Theme toggle switch */
 .theme-switch-container {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    margin-bottom: 1rem;
 }
 
 .theme-switch {
