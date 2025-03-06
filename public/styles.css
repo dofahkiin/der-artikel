@@ -1,0 +1,62 @@
+/* Keep body font-size at least 16px so iOS Safari won't auto-zoom */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    text-align: center;
+    font-size: 16px; /* or 17px, etc. */
+  }
+  
+  .status {
+    margin: 20px 0;
+  }
+  
+  .word {
+    font-size: 1.25em; /* e.g., 20px on most phones */
+    margin: 20px 0;
+    cursor: pointer;
+  }
+  
+  .button {
+    /* Ensure no layout jump on color change */
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+  
+    /* Sizing */
+    width: 100px;   /* Force a stable button width */
+    height: 80px;  /* Force a stable button height */
+    padding: 10px 20px;
+    margin: 10px;
+  
+    /* Keep text size at least 16px to avoid iOS auto-zoom */
+    font-size: 16px;
+    line-height: 1.2;
+  
+    cursor: pointer;
+  
+    /* Box-sizing to ensure border/padding won't shift size */
+    box-sizing: border-box;
+  }
+  
+  /* Make correct/wrong just change colors, not size or weight */
+  .button.correct {
+    background-color: green;
+    color: white;
+    font-weight: normal; /* ensure same weight as default */
+  }
+  
+  .button.wrong {
+    background-color: red;
+    color: white;
+    font-weight: normal;
+  }
+  
+  /* Hide initially, then use JS to show as needed */
+  #results {
+    display: none;
+    margin-top: 20px;
+  }
+  
+  #failedListsContainer {
+    margin-top: 40px;
+  }
