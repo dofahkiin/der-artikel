@@ -7,50 +7,62 @@
   <link rel="apple-touch-icon" href="logo192.png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <title>German Articles Quiz</title>
 </head>
 <body>
-  <h1>Guess the German Article</h1>
+  <div class="quiz-container">
+    <h1>Master German Articles</h1>
 
-  <div class="status">
-    <span id="progress">0</span> words answered,
-    <span id="remaining">0</span> remaining
+    <div class="status">
+      <div class="status-item">
+        Answered: <span id="progress">0</span>
+      </div>
+      <div class="status-item">
+        Remaining: <span id="remaining">0</span>
+      </div>
+    </div>
+
+    <!-- The word to guess -->
+    <div class="word" id="word">Loading...</div>
+
+    <!-- Article Buttons -->
+    <div id="buttons">
+      <button class="button" onclick="checkAnswer('der')">Der</button>
+      <button class="button" onclick="checkAnswer('die')">Die</button>
+      <button class="button" onclick="checkAnswer('das')">Das</button>
+    </div>
+
+    <!-- Next / Stop Buttons -->
+    <div class="nav-buttons">
+      <button class="button" id="nextButton" onclick="nextWord()">Next Word</button>
+      <button class="button" id="stopButton" onclick="stopQuiz()">End Quiz</button>
+    </div>
   </div>
-
-  <!-- The word to guess -->
-  <div class="word" id="word">Loading...</div>
-
-  <!-- Article Buttons -->
-  <div id="buttons">
-    <button class="button" onclick="checkAnswer('der')">Der</button>
-    <button class="button" onclick="checkAnswer('die')">Die</button>
-    <button class="button" onclick="checkAnswer('das')">Das</button>
-  </div>
-
-  <!-- Next / Stop Buttons -->
-  <button class="button" id="nextButton" onclick="nextWord()">Next</button>
-  <button class="button" id="stopButton" onclick="stopQuiz()">Stop</button>
 
   <!-- Results -->
-  <div id="results" style="display:none; margin-top:20px;"></div>
-  
-  <!-- Buttons for after quiz ends -->
-  <button class="button" id="failedListButton" style="display:none;" onclick="startFailedListQuiz()">
-    Failed list
-  </button>
-  <!-- Save the failed list to a new JSON file -->
-  <button class="button" id="saveFailedListButton" style="display:none;" onclick="saveFailedList()">
-    Save failed list
-  </button>
+  <div id="results" style="display:none;">
+    <h2>Quiz Results</h2>
+    <div id="results-content"></div>
+    
+    <!-- Buttons for after quiz ends -->
+    <button class="button" id="failedListButton" style="display:none;" onclick="startFailedListQuiz()">
+      Practice Mistakes
+    </button>
+    <!-- Save the failed list to a new JSON file -->
+    <button class="button" id="saveFailedListButton" style="display:none;" onclick="saveFailedList()">
+      Save Mistake List
+    </button>
+  </div>
 
   <!-- Container to show the list of existing saved failed-lists -->
   <div id="failedListsContainer" style="display:none;">
-    <h2>Saved Failed Lists</h2>
+    <h2>Your Saved Lists</h2>
     <select id="failedListsSelect">
-      <option value="">-- Choose a file --</option>
+      <option value="">-- Select a saved list --</option>
     </select>
     <button class="button" onclick="loadSelectedFailedList()">Load Selected List</button>
-    <div id="loadError" style="color:red; margin-top:10px;"></div>
+    <div id="loadError"></div>
   </div>
 
   <script src="script.js"></script>

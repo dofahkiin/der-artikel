@@ -1,62 +1,311 @@
-/* Keep body font-size at least 16px so iOS Safari won't auto-zoom */
-body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
+/* Modern design for German Articles Quiz */
+:root {
+    --primary: #4E6CFF;
+    --primary-dark: #3A56E8;
+    --secondary: #FF6B6B;
+    --light: #F9F9FB;
+    --dark: #2D3748;
+    --gray: #718096;
+    --correct: #38A169;
+    --wrong: #E53E3E;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --radius: 12px;
+    --transition: all 0.3s ease;
+  }
+  
+  body {
+    font-family: 'Nunito', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--light);
+    color: var(--dark);
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+  }
+  
+  /* Main container */
+  .quiz-container {
+    background-color: white;
+    box-shadow: var(--shadow);
+    border-radius: var(--radius);
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
     text-align: center;
-    font-size: 16px; /* or 17px, etc. */
   }
   
   .status {
-    margin: 20px 0;
+    background-color: var(--light);
+    border-radius: var(--radius);
+    padding: 0.8rem 1.2rem;
+    margin: 1.5rem 0;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    color: var(--gray);
+    font-size: 0.9rem;
   }
   
+  .status-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .status-item span {
+    margin-left: 0.5rem;
+    font-weight: 700;
+    color: var(--dark);
+  }
+  
+  /* Word display */
   .word {
-    font-size: 1.25em; /* e.g., 20px on most phones */
-    margin: 20px 0;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: var(--light);
+    border-radius: var(--radius);
     cursor: pointer;
+    transition: var(--transition);
+    color: var(--dark);
+    text-align: center;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    position: relative;
+  }
+  
+  .word:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 4px 8px rgba(0,0,0,0.05);
+  }
+  
+  .word::after {
+    content: "👆 Tap for translation";
+    position: absolute;
+    bottom: -1.5rem;
+    left: 0;
+    right: 0;
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: var(--gray);
+    opacity: 0.7;
+  }
+  
+  /* Article buttons */
+  #buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 2rem 0;
   }
   
   .button {
-    /* Ensure no layout jump on color change */
-    display: inline-block;
-    vertical-align: middle;
-    text-align: center;
-  
-    /* Sizing */
-    width: 100px;   /* Force a stable button width */
-    height: 80px;  /* Force a stable button height */
-    padding: 10px 20px;
-    margin: 10px;
-  
-    /* Keep text size at least 16px to avoid iOS auto-zoom */
-    font-size: 16px;
-    line-height: 1.2;
-  
+    background-color: white;
+    color: var(--dark);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
     cursor: pointer;
-  
-    /* Box-sizing to ensure border/padding won't shift size */
-    box-sizing: border-box;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    width: auto;
+    min-height: 60px;
   }
   
-  /* Make correct/wrong just change colors, not size or weight */
-  .button.correct {
-    background-color: green;
+  .button:hover {
+    background-color: var(--primary);
     color: white;
-    font-weight: normal; /* ensure same weight as default */
+    transform: translateY(-2px);
+  }
+  
+  .button:active {
+    transform: translateY(0);
+  }
+  
+  .button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .button.correct {
+    background-color: var(--correct);
+    border-color: var(--correct);
+    color: white;
   }
   
   .button.wrong {
-    background-color: red;
+    background-color: var(--wrong);
+    border-color: var(--wrong);
     color: white;
-    font-weight: normal;
   }
   
-  /* Hide initially, then use JS to show as needed */
+  /* Navigation buttons */
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+  }
+  
+  #nextButton, #stopButton {
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: var(--transition);
+    width: 48%;
+  }
+  
+  #nextButton {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+  }
+  
+  #nextButton:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  #nextButton:disabled {
+    background-color: var(--gray);
+    cursor: not-allowed;
+  }
+  
+  #stopButton {
+    background-color: transparent;
+    color: var(--gray);
+    border: 2px solid var(--gray);
+  }
+  
+  #stopButton:hover {
+    background-color: var(--gray);
+    color: white;
+  }
+  
+  /* Results section */
   #results {
-    display: none;
-    margin-top: 20px;
+    background-color: white;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: var(--shadow);
+    width: 100%;
+  }
+  
+  #results h2 {
+    color: var(--primary);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--light);
+    padding-bottom: 0.5rem;
+  }
+  
+  #results h3 {
+    color: var(--dark);
+    font-size: 1.2rem;
+    margin: 1.5rem 0 0.8rem;
+  }
+  
+  #results p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
+  
+  #results ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 1rem 0;
+  }
+  
+  #results li {
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+    background-color: var(--light);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Failed lists section */
+  #failedListButton, #saveFailedListButton {
+    margin: 1rem 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
   }
   
   #failedListsContainer {
-    margin-top: 40px;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 100%;
+  }
+  
+  #failedListsContainer h2 {
+    color: var(--primary);
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+  
+  #failedListsSelect {
+    padding: 0.8rem;
+    border-radius: var(--radius);
+    border: 2px solid var(--light);
+    font-size: 1rem;
+    margin-right: 0.5rem;
+    background-color: white;
+    color: var(--dark);
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  #loadError {
+    color: var(--wrong);
+    margin-top: 0.8rem;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .quiz-container {
+      padding: 1.5rem;
+      margin: 0;
+      width: calc(100% - 2rem);
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+    }
+    
+    .word {
+      font-size: 1.8rem;
+      padding: 1.2rem;
+      margin: 1.5rem 0 2.5rem;
+    }
+    
+    .button {
+      font-size: 1rem;
+      min-height: 50px;
+    }
   }
