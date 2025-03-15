@@ -273,6 +273,30 @@ function startFailedListQuiz() {
   showWord();
 }
 
+// Restart the quiz with all original words from words.json
+function restartFullQuiz() {
+  // Reset all quiz variables
+  currentWordIndex = 0;
+  correctAnswers = 0;
+  wrongAnswers = 0;
+  wrongWords = [];
+  
+  // Re-shuffle all the words
+  words = [...shuffleArray(allWords)];
+  
+  // Hide results
+  document.getElementById('results').style.display = 'none';
+  
+  // Hide container for previously saved lists
+  document.getElementById('failedListsContainer').style.display = 'none';
+  
+  // Show quiz container again
+  document.querySelector('.quiz-container').style.display = 'block';
+  
+  updateStatus();
+  showWord();
+}
+
 // Save the current 'wrongWords' to a new JSON file on the server
 async function saveFailedList() {
   try {
